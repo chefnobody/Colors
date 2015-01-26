@@ -11,10 +11,13 @@
 #import "TTColorTableViewCell.h"
 #import "UIColor+TTExtensions.h"
 #import "TTColorViewController.h"
+#import "TTInteractionController.h"
 
 @interface TTColorsViewController ()
 
 @property (nonatomic) NSArray * colors;
+@property (nonatomic) TTInteractionController * interactionController;
+@property (nonatomic) BOOL suppressSelection;
 
 @end
 
@@ -38,9 +41,12 @@
     // set up table view
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
-
+    
     UINib * xib = [UINib nibWithNibName:NSStringFromClass([TTColorTableViewCell class]) bundle:nil];
     [self.tableView registerNib:xib forCellReuseIdentifier:@"ColorCell"];
+    
+    // set up interaction controller
+    self.interactionController = [[TTInteractionController alloc] initWithParentViewController:self];
 }
 
 #pragma mark UITableViewDataSource methods
@@ -68,6 +74,29 @@
     TTColor * color = [self.colors objectAtIndex:indexPath.row];
     TTColorViewController * colorViewController = [[TTColorViewController alloc] initWithColor:color];
     [self.navigationController pushViewController:colorViewController animated:YES];
+}
+
+#pragma mark Helper methods
+
+- (TTColor *)colorForSelectedRow {
+    NSIndexPath * selectedIndexPath = [self.tableView indexPathForSelectedRow];
+    TTColor * color = [self.colors objectAtIndex:selectedIndexPath.row];
+    return color;
+}
+
+- (void)selectRowAtLocation:(CGPoint)location {
+    NSIndexPath * tappedIndexPath = [self.tableView indexPathForRowAtPoint:location];
+    self.suppressSelection = YES;
+    [self.tableView selectRowAtIndexPath:tappedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+    self.suppressSelection = NO;
+}
+
+- (void)selectRowWithColor:(TTColor *)color {
+    NSInteger row = [self.colors indexOfObject:color];
+    NSIndexPath * colorIndexPath = [NSIndexPath indexPathForRow:row inSection:0];
+    self.suppressSelection = YES;
+    [self.tableView selectRowAtIndexPath:colorIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+    self.suppressSelection = NO;
 }
 
 @end

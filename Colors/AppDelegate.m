@@ -10,6 +10,10 @@
 #import "TTColorsViewController.h"
 #import "TTColor.h"
 #import "UIColor+TTExtensions.h"
+#import "TTAnimatorFactory.h"
+#import "TTVerticalSplitAnimationController.h"
+#import "TTColorViewController.h"
+#import "TTColorsViewController.h"
 
 @interface AppDelegate ()
 
@@ -21,6 +25,17 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    // register the animation controller with the factory for the two vc's it should interact with
+    [[TTAnimatorFactory sharedInstance] registerAnimationControllerClass:[TTVerticalSplitAnimationController class]
+                                            forParentViewControllerClass:[TTColorsViewController class]
+                                                childViewControllerClass:[TTColorViewController class]];
+    
+    [[TTAnimatorFactory sharedInstance] registerAnimationControllerClass:[TTVerticalSplitAnimationController class]
+                                            forParentViewControllerClass:[TTColorViewController class]
+                                                childViewControllerClass:[TTColorsViewController class]];
+    
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     NSLog(@"window frame: %@", NSStringFromCGRect(self.window.frame));
     self.colors = [self setUpColors];

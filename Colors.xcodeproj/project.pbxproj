@@ -23,6 +23,7 @@
 		B00E61141A76D41B00DB536E /* UIColor+TTExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = B00E61131A76D41B00DB536E /* UIColor+TTExtensions.m */; };
 		B00E61181A76D80C00DB536E /* TTColorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B00E61161A76D80C00DB536E /* TTColorViewController.m */; };
 		B00E61191A76D80C00DB536E /* TTColorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B00E61171A76D80C00DB536E /* TTColorViewController.xib */; };
+		B00E611C1A76F59600DB536E /* TTAnimatorFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = B00E611B1A76F59600DB536E /* TTAnimatorFactory.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,8 @@
 		B00E61151A76D80C00DB536E /* TTColorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TTColorViewController.h; path = ViewControllers/TTColorViewController.h; sourceTree = "<group>"; };
 		B00E61161A76D80C00DB536E /* TTColorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TTColorViewController.m; path = ViewControllers/TTColorViewController.m; sourceTree = "<group>"; };
 		B00E61171A76D80C00DB536E /* TTColorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TTColorViewController.xib; path = ViewControllers/TTColorViewController.xib; sourceTree = "<group>"; };
+		B00E611A1A76F59600DB536E /* TTAnimatorFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TTAnimatorFactory.h; path = AnimatorFactory/TTAnimatorFactory.h; sourceTree = "<group>"; };
+		B00E611B1A76F59600DB536E /* TTAnimatorFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TTAnimatorFactory.m; path = AnimatorFactory/TTAnimatorFactory.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +155,8 @@
 		B00E60F61A75BE6F00DB536E /* AnimatorFactory */ = {
 			isa = PBXGroup;
 			children = (
+				B00E611A1A76F59600DB536E /* TTAnimatorFactory.h */,
+				B00E611B1A76F59600DB536E /* TTAnimatorFactory.m */,
 			);
 			name = AnimatorFactory;
 			sourceTree = "<group>";
@@ -313,6 +318,7 @@
 				B00E61141A76D41B00DB536E /* UIColor+TTExtensions.m in Sources */,
 				B00E61011A75BEEA00DB536E /* TTInteractionController.m in Sources */,
 				B00E61071A75BF5900DB536E /* TTVerticalSplitAnimationController.m in Sources */,
+				B00E611C1A76F59600DB536E /* TTAnimatorFactory.m in Sources */,
 				B00E60D61A75BD9300DB536E /* AppDelegate.m in Sources */,
 				B00E61181A76D80C00DB536E /* TTColorViewController.m in Sources */,
 				B00E610F1A76D22C00DB536E /* TTColorTableViewCell.m in Sources */,
