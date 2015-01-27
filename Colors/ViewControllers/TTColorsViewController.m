@@ -71,6 +71,7 @@
 #pragma mark UITableViewDelegate methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     TTColor * color = [self.colors objectAtIndex:indexPath.row];
     TTColorViewController * colorViewController = [[TTColorViewController alloc] initWithColor:color];
     [self.navigationController pushViewController:colorViewController animated:YES];
@@ -97,6 +98,20 @@
     self.suppressSelection = YES;
     [self.tableView selectRowAtIndexPath:colorIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
     self.suppressSelection = NO;
+}
+
+- (UILabel *)labelForSelectedRow {
+    NSIndexPath * selectedIndexPath = [self.tableView indexPathForSelectedRow];
+    UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:selectedIndexPath];
+    UILabel * label = [[UILabel alloc] init];
+    label.text = cell.textLabel.text;
+
+    // convert the cell label view's frame from the cell to the table and assign it to our new image view
+    label.frame = [self.tableView convertRect:cell.textLabel.frame fromView:cell];
+    
+    NSLog(@"color text label frame after conversion: %@", NSStringFromCGRect(label.frame));
+    
+    return label;
 }
 
 @end

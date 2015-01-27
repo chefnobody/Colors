@@ -9,74 +9,98 @@
 #import "TTVerticalSplitAnimationController.h"
 #import "TTColorsViewController.h"
 #import "TTColorViewController.h"
+#import "UIColor+TTExtensions.h"
 
 #define TTRectSetY( r, y )  CGRectMake( r.origin.x, y, r.size.width, r.size.height )
 
 @implementation TTVerticalSplitAnimationController
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 0.5f;
+    return 1.0f;
 }
 
 - (void)animateTransition:(id <UIViewControllerContextTransitioning>)transitionContext {
     
     UIView * containerView = transitionContext.containerView;
-    UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    UIViewController * fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+    UIViewController * toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
     if ( self.isPushing ) {
         
+        TTColorsViewController * colorsViewController = (TTColorsViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+        TTColorViewController * colorViewController = (TTColorViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+        
+        // set container view background color
+        TTColor * color = [colorsViewController colorForSelectedRow];
+        containerView.backgroundColor = color.color;
+        
         // Add to vc below from vc
-        [containerView insertSubview:toViewController.view belowSubview:fromViewController.view];
+        [containerView insertSubview:colorViewController.view belowSubview:colorsViewController.view];
         
         // get selected cell from table
-        UITableView * tableView = ((TTColorsViewController*)fromViewController).tableView;
+        UITableView * tableView = colorsViewController.tableView;
         NSIndexPath * selectedIndexPath = [tableView indexPathForSelectedRow];
         UITableViewCell * selectedCell = [tableView cellForRowAtIndexPath:selectedIndexPath];
         
-        // blank out the backgrounds of both the table view and it's parent view
+        // blank out the backgrounds of the table view and it's parent view and the cell
         tableView.backgroundColor = [UIColor clearColor];
         fromViewController.view.backgroundColor = [UIColor clearColor];
+        selectedCell.alpha = 0.0;
         
-        selectedCell.alpha = 0.0;           // blank out the cell
-        
-        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:selectedCell];
+        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:selectedCell]; // row of selected cell relative to visible cells
         NSInteger topCellCount = selectedRowRelativeToVisibleCells;   // number of cells above this one = row count because row is a 0 based index.
         NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;     // number of cells below this one = (total count-1 'for zero based index')-selected row
-        
+         
         // calculate distances that cells should move in order to be off-screen
         CGFloat topDistance = topCellCount * CGRectGetHeight(selectedCell.frame);
         CGFloat bottomDistance = bottomCellCount * CGRectGetHeight(selectedCell.frame);
         
-        /*NSLog(@"selected row relative to visible cells: %i", selectedRowRelativeToVisibleCells);
-         NSLog(@"selected cell row %i", selectedIndexPath.row);
-         NSLog(@"top cell count %i", topCellCount);
-         NSLog(@"bottom cell count %i", bottomCellCount);
-         NSLog(@"cell height: %f", selectedCell.frame.size.height);
-         NSLog(@"top distance: %f", topDistance);
-         NSLog(@"bottom distance: %f", bottomDistance);*/
-        
-        // Prepare to animate label into place
+        // prepare to animate label into place
+//        UILabel * label = [colorsViewController labelForSelectedRow];
+//        label.layer.borderColor = [UIColor redColor].CGColor;
+//        label.layer.borderWidth = 1.0f;
+//        label.textAlignment = NSTextAlignmentCenter;
+//        label.frame = [containerView convertRect:label.frame fromView:tableView];
+//        [containerView insertSubview:label belowSubview:fromViewController.view];
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             
+            
+            [tableView.visibleCells enumerateObjectsUsingBlock:^(UITableViewCell * cell, NSUInteger idx, BOOL *stop) {
+                if ( cell != selectedCell ) {
+                    
+                    NSIndexPath * cellIndexPath = [tableView indexPathForCell:cell];
+                    
+                    if (cellIndexPath.row < selectedIndexPath.row) {
+                        // move cells up by subtracting height and distance
+                        cell.frame = TTRectSetY(cell.frame, (CGRectGetMinY(cell.frame) - topDistance));
+                    }else{
+                        // move cells down by adding height and distance
+                        cell.frame = TTRectSetY(cell.frame, CGRectGetMinY(cell.frame) + bottomDistance);
+                    }
+                }
+            }];
+            
             // find all visible cells except the one selected and move them out of view
-            for(UITableViewCell * c in tableView.visibleCells) {
+            /*for(UITableViewCell * c in tableView.visibleCells) {
                 if ( c != selectedCell ) {
                     
                     NSIndexPath * cellIndexPath = [tableView indexPathForCell:c];
                     
                     if (cellIndexPath.row < selectedIndexPath.row) {
-                        // move cells up
-                        c.frame = TTRectSetY(c.frame, (CGRectGetMinY(c.frame) - topDistance));      // subtract height and distance
+                        // move cells up by subtracting height and distance
+                        c.frame = TTRectSetY(c.frame, (CGRectGetMinY(c.frame) - topDistance));
                     }else{
-                        // move cells down
-                        c.frame = TTRectSetY(c.frame, CGRectGetMinY(c.frame) + bottomDistance);     // add height and distance
+                        // move cells down by adding height and distance
+                        c.frame = TTRectSetY(c.frame, CGRectGetMinY(c.frame) + bottomDistance);
                     }
                 }
-            }
+            }*/
             
-            // set final place of animated label
+//            // set final position, color and size of label
+//            label.center = colorViewController.view.center;
+//            label.textColor = [color.color isTooDarkForBlackText] ? [UIColor whiteColor] : [UIColor blackColor];
+//            label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:30.0];
             
         } completion:^(BOOL finished) {
             
@@ -84,6 +108,7 @@
             [tableView reloadRowsAtIndexPaths:[tableView indexPathsForVisibleRows] withRowAnimation:UITableViewRowAnimationNone];
             
             // remove label from container view
+            //[label removeFromSuperview];
             
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
@@ -143,17 +168,7 @@
                 }
             }
         }
-        
-        /*NSLog(@"selected row relative to visible cells: %i", selectedRowRelativeToVisibleCells);
-         NSLog(@"selected cell row %i", selectedIndexPath.row);
-         NSLog(@"top cell count %i", topCellCount);
-         NSLog(@"bottom cell count %i", bottomCellCount);
-         NSLog(@"cell height: %f", selectedCell.frame.size.height);
-         NSLog(@"top distance: %f", topDistance);
-         NSLog(@"bottom distance: %f", bottomDistance);*/
-        
-        // prepare to animate label into place
-        
+
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
             
             // convert cell frame to container view

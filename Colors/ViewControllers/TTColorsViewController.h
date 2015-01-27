@@ -18,5 +18,6 @@
 - (TTColor *)colorForSelectedRow;
 - (void)selectRowAtLocation:(CGPoint)location;
 - (void)selectRowWithColor:(TTColor *)color;
+- (UILabel *)labelForSelectedRow;
 
 @end

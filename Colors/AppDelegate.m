@@ -35,7 +35,6 @@
                                             forParentViewControllerClass:[TTColorViewController class]
                                                 childViewControllerClass:[TTColorsViewController class]];
     
-    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     NSLog(@"window frame: %@", NSStringFromCGRect(self.window.frame));
     self.colors = [self setUpColors];
