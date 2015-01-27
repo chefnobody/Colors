@@ -30,6 +30,9 @@
         TTColorsViewController * colorsViewController = (TTColorsViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
         TTColorViewController * colorViewController = (TTColorViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
         
+        colorViewController.view.layer.borderColor = [UIColor redColor].CGColor;
+        colorViewController.view.layer.borderWidth = 1.0f;
+        
         // set container view background color
         TTColor * color = [colorsViewController colorForSelectedRow];
         containerView.backgroundColor = color.color;
@@ -47,9 +50,14 @@
         fromViewController.view.backgroundColor = [UIColor clearColor];
         selectedCell.alpha = 0.0;
         
-        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:selectedCell]; // row of selected cell relative to visible cells
-        NSInteger topCellCount = selectedRowRelativeToVisibleCells;   // number of cells above this one = row count because row is a 0 based index.
-        NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;     // number of cells below this one = (total count-1 'for zero based index')-selected row
+        // row of selected cell relative to visible cells
+        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:selectedCell];
+        
+        // number of cells above this one = row count because row is a 0 based index.
+        NSInteger topCellCount = selectedRowRelativeToVisibleCells;
+        
+        // number of cells below this one = (total count-1 'for zero based index')-selected row
+        NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;
          
         // calculate distances that cells should move in order to be off-screen
         CGFloat topDistance = topCellCount * CGRectGetHeight(selectedCell.frame);
@@ -65,7 +73,6 @@
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             
-            
             [tableView.visibleCells enumerateObjectsUsingBlock:^(UITableViewCell * cell, NSUInteger idx, BOOL *stop) {
                 if ( cell != selectedCell ) {
                     
@@ -80,22 +87,6 @@
                     }
                 }
             }];
-            
-            // find all visible cells except the one selected and move them out of view
-            /*for(UITableViewCell * c in tableView.visibleCells) {
-                if ( c != selectedCell ) {
-                    
-                    NSIndexPath * cellIndexPath = [tableView indexPathForCell:c];
-                    
-                    if (cellIndexPath.row < selectedIndexPath.row) {
-                        // move cells up by subtracting height and distance
-                        c.frame = TTRectSetY(c.frame, (CGRectGetMinY(c.frame) - topDistance));
-                    }else{
-                        // move cells down by adding height and distance
-                        c.frame = TTRectSetY(c.frame, CGRectGetMinY(c.frame) + bottomDistance);
-                    }
-                }
-            }*/
             
 //            // set final position, color and size of label
 //            label.center = colorViewController.view.center;

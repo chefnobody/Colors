@@ -26,6 +26,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.title = @"Color";
+    self.edgesForExtendedLayout = UIRectEdgeNone;
     self.view.backgroundColor = self.color.color;
     self.colorLabel.text = self.color.name;
     self.colorLabel.textColor = [self.color.color isTooDarkForBlackText] ? [UIColor whiteColor] : [UIColor blackColor];
