@@ -96,7 +96,6 @@
 #pragma mark UITableViewDelegate methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     TTColor * color = [self.colors objectAtIndex:indexPath.row];
     TTColorViewController * colorViewController = [[TTColorViewController alloc] initWithColor:color];
     [self.navigationController pushViewController:colorViewController animated:YES];
@@ -127,6 +126,7 @@
 
 - (UILabel *)labelForSelectedRow {
     NSIndexPath * selectedIndexPath = [self.tableView indexPathForSelectedRow];
+    NSLog(@"selected index path: %@", selectedIndexPath);
     UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:selectedIndexPath];
     UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.tableView.frame), 44)];
     label.text = cell.textLabel.text;

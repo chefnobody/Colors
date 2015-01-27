@@ -22,17 +22,12 @@
 - (void)animateTransition:(id <UIViewControllerContextTransitioning>)transitionContext {
     
     UIView * containerView = transitionContext.containerView;
-    UIViewController * fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    UIViewController * toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
     if ( self.isPushing ) {
         
         TTColorsViewController * colorsViewController = (TTColorsViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
         TTColorViewController * colorViewController = (TTColorViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-        
-        colorViewController.view.layer.borderColor = [UIColor redColor].CGColor;
-        colorViewController.view.layer.borderWidth = 1.0f;
-        
+
         // set container view background color
         containerView.backgroundColor = colorViewController.color.color;
         
@@ -46,7 +41,7 @@
         
         // blank out the backgrounds of the table view and it's parent view and the cell
         tableView.backgroundColor = [UIColor clearColor];
-        fromViewController.view.backgroundColor = [UIColor clearColor];
+        colorsViewController.view.backgroundColor = [UIColor clearColor];
         selectedCell.alpha = 0.0;
         
         // row of selected cell relative to visible cells
@@ -64,15 +59,11 @@
         
         // prepare to animate label into place
         UILabel * label = [colorsViewController labelForSelectedRow];
-        label.layer.borderColor = [UIColor redColor].CGColor;
-        label.layer.borderWidth = 1.0f;
         label.textAlignment = NSTextAlignmentCenter;
         label.frame = [containerView convertRect:label.frame fromView:tableView];
-        [containerView insertSubview:label belowSubview:fromViewController.view];
+        [containerView insertSubview:label belowSubview:colorsViewController.view];
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            
-            NSLog(@"table view: %@", tableView);
             
             [tableView.visibleCells enumerateObjectsUsingBlock:^(UITableViewCell * cell, NSUInteger idx, BOOL *stop) {
                 if ( cell != selectedCell ) {

@@ -40,8 +40,6 @@
 
     self.view.backgroundColor = self.color.color;
     self.colorLabel.textColor = [self.color.color isTooDarkForBlackText] ? [UIColor whiteColor] : [UIColor blackColor];
-    self.colorLabel.layer.borderColor = [UIColor yellowColor].CGColor;
-    self.colorLabel.layer.borderWidth = 1.0f;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
