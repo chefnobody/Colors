@@ -34,8 +34,7 @@
         colorViewController.view.layer.borderWidth = 1.0f;
         
         // set container view background color
-        TTColor * color = [colorsViewController colorForSelectedRow];
-        containerView.backgroundColor = color.color;
+        containerView.backgroundColor = colorViewController.color.color;
         
         // Add to vc below from vc
         [containerView insertSubview:colorViewController.view belowSubview:colorsViewController.view];
@@ -64,14 +63,16 @@
         CGFloat bottomDistance = bottomCellCount * CGRectGetHeight(selectedCell.frame);
         
         // prepare to animate label into place
-//        UILabel * label = [colorsViewController labelForSelectedRow];
-//        label.layer.borderColor = [UIColor redColor].CGColor;
-//        label.layer.borderWidth = 1.0f;
-//        label.textAlignment = NSTextAlignmentCenter;
-//        label.frame = [containerView convertRect:label.frame fromView:tableView];
-//        [containerView insertSubview:label belowSubview:fromViewController.view];
+        UILabel * label = [colorsViewController labelForSelectedRow];
+        label.layer.borderColor = [UIColor redColor].CGColor;
+        label.layer.borderWidth = 1.0f;
+        label.textAlignment = NSTextAlignmentCenter;
+        label.frame = [containerView convertRect:label.frame fromView:tableView];
+        [containerView insertSubview:label belowSubview:fromViewController.view];
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            
+            NSLog(@"table view: %@", tableView);
             
             [tableView.visibleCells enumerateObjectsUsingBlock:^(UITableViewCell * cell, NSUInteger idx, BOOL *stop) {
                 if ( cell != selectedCell ) {
@@ -88,35 +89,35 @@
                 }
             }];
             
-//            // set final position, color and size of label
-//            label.center = colorViewController.view.center;
-//            label.textColor = [color.color isTooDarkForBlackText] ? [UIColor whiteColor] : [UIColor blackColor];
-//            label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:30.0];
+            // set final position, color and size of label
+            label.center = colorViewController.view.center;
+            label.textColor = [colorViewController.color.color isTooDarkForBlackText] ? [UIColor whiteColor] : [UIColor blackColor];
+            label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:30.0];
             
         } completion:^(BOOL finished) {
             
-            // Reload only visible rows
-            [tableView reloadRowsAtIndexPaths:[tableView indexPathsForVisibleRows] withRowAnimation:UITableViewRowAnimationNone];
-            
             // remove label from container view
-            //[label removeFromSuperview];
+            [label removeFromSuperview];
             
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
         
     } else {
+
+        TTColorViewController * colorViewController = (TTColorViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+        TTColorsViewController * colorsViewController = (TTColorsViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
         
         // insert to vc above from vc
-        [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
+        [containerView insertSubview:colorsViewController.view aboveSubview:colorViewController.view];
         
         // get color from details view controller
-        TTColor * color = ((TTColorViewController *)fromViewController).color;
+        TTColor * color = colorViewController.color;
         
         // select row with given color
-        [((TTColorsViewController *)toViewController) selectRowWithColor:color];
+        [colorsViewController selectRowWithColor:color];
         
         // get selected cell from table
-        UITableView * tableView = ((TTColorsViewController*)toViewController).tableView;
+        UITableView * tableView = colorsViewController.tableView;
         NSIndexPath * selectedIndexPath = [tableView indexPathForSelectedRow];
         UITableViewCell * selectedCell = [tableView cellForRowAtIndexPath:selectedIndexPath];
         //NSLog(@"selected index path: %@", selectedIndexPath);
@@ -163,7 +164,7 @@
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
             
             // convert cell frame to container view
-            selectedCell.frame = [containerView convertRect:selectedCell.frame fromView:((TTColorsViewController*)toViewController).tableView];
+            selectedCell.frame = [containerView convertRect:selectedCell.frame fromView:colorsViewController.tableView];
 
             // animate label
             
@@ -171,7 +172,7 @@
             for(UITableViewCell * c in tableView.visibleCells) {
                 NSInteger rowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:c];
                 
-                NSLog(@"reset frame to: %@", NSStringFromCGRect([[originalCellFrames objectAtIndex:rowRelativeToVisibleCells] CGRectValue]));
+                //NSLog(@"reset frame to: %@", NSStringFromCGRect([[originalCellFrames objectAtIndex:rowRelativeToVisibleCells] CGRectValue]));
                 // reset all cell frames to original
                 c.frame = [[originalCellFrames objectAtIndex:rowRelativeToVisibleCells] CGRectValue];
             }
