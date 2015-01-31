@@ -49,31 +49,6 @@
     self.interactionController = [[TTInteractionController alloc] initWithParentViewController:self];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    NSLog(@"TTColorsViewController - view will appear");
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    NSLog(@"TTColorsViewController - view did appear");
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
-    NSLog(@"TTColorsViewController - view will disappear");
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-    
-    NSLog(@"TTColorsViewController - view did disappear");
-}
-
-
 #pragma mark UITableViewDataSource methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -96,9 +71,7 @@
 #pragma mark UITableViewDelegate methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    TTColor * color = [self.colors objectAtIndex:indexPath.row];
-    TTColorViewController * colorViewController = [[TTColorViewController alloc] initWithColor:color];
-    [self.navigationController pushViewController:colorViewController animated:YES];
+    [self.interactionController push];
 }
 
 #pragma mark Helper methods
@@ -126,15 +99,12 @@
 
 - (UILabel *)labelForSelectedRow {
     NSIndexPath * selectedIndexPath = [self.tableView indexPathForSelectedRow];
-    NSLog(@"selected index path: %@", selectedIndexPath);
     UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:selectedIndexPath];
     UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.tableView.frame), 44)];
     label.text = cell.textLabel.text;
 
     // convert the cell label view's frame from the cell to the table and assign it to our new image view
     label.frame = [self.tableView convertRect:cell.textLabel.frame fromView:cell];
-    
-    NSLog(@"color text label frame after conversion: %@", NSStringFromCGRect(label.frame));
     
     return label;
 }

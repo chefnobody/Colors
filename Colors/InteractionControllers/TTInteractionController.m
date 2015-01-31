@@ -85,7 +85,6 @@
 
 - (id<UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController
                          interactionControllerForAnimationController:(id<UIViewControllerAnimatedTransitioning>)animationController {
-    NSLog(@"navigationController:interactionControllerForAnimationController: %@ - interactive: %i", animationController, self.isInteractive);
     if ( self.isInteractive ) {
         return self;
     }
@@ -108,8 +107,6 @@
         
         if ( location.x < CGRectGetMidX(view.bounds) && velocity.x > 10 ) {
             
-            //NSLog(@"gesture began! pushing %i", self.pushing);
-            
             self.pushing = YES;
             
             // Push to details
@@ -120,14 +117,11 @@
             [colorViewController.view addGestureRecognizer:panGestureRecognizer];
             [self.parentViewController.navigationController pushViewController:colorViewController animated:YES];
             
-            //NSLog(@"selected point: %@", NSStringFromCGPoint(location));
-            
             // Set selected cell for location
             [((TTColorsViewController *)self.parentViewController) selectRowAtLocation:location];
             
             // Get color for selected row
             TTColor * color = [((TTColorsViewController *)self.parentViewController) colorForSelectedRow];
-            //NSLog(@"color: %@", color);
             colorViewController.color = color;
             
         } else {
@@ -146,8 +140,6 @@
         if (percentComplete >= 1.0) {
             percentComplete = .99;
         }
-        
-        //NSLog(@"percent complete: %f", percentComplete);
         
         [self updateInteractiveTransition:percentComplete];
         

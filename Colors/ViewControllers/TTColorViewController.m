@@ -35,8 +35,6 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    NSLog(@"TTColorViewController - view will appear");
 
     self.view.backgroundColor = self.color.color;
     self.colorLabel.textColor = [self.color.color isTooDarkForBlackText] ? [UIColor whiteColor] : [UIColor blackColor];
@@ -45,22 +43,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    NSLog(@"TTColorViewController - view did appear");
-    
     self.colorLabel.text = self.color.name;
 }
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
-    NSLog(@"TTColorViewController - view will disappear");
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-    
-    NSLog(@"TTColorViewController - view did disappear");
-}
-
 
 @end

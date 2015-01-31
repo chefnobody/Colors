@@ -111,7 +111,6 @@
         UITableView * tableView = colorsViewController.tableView;
         NSIndexPath * selectedIndexPath = [tableView indexPathForSelectedRow];
         UITableViewCell * selectedCell = [tableView cellForRowAtIndexPath:selectedIndexPath];
-        //NSLog(@"selected index path: %@", selectedIndexPath);
         
         // if selected cell is not visible scroll it into view and retrieve it again
         if ( ! [tableView.visibleCells containsObject:selectedCell] )
@@ -120,11 +119,17 @@
             selectedCell = [tableView cellForRowAtIndexPath:selectedIndexPath];
         }
         
-        selectedCell.alpha = 0.0;           // blank out the cell
+        // hide the cell
+        selectedCell.alpha = 0.0;
         
-        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:selectedCell]; // row of selected cell relative to visible cells
-        NSInteger topCellCount = selectedRowRelativeToVisibleCells;   // number of cells above this one = row count because row is a 0 based index.
-        NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;     // number of cells below this one = (total count-1 'for zero based index')-selected row
+        // row of selected cell relative to visible cells
+        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:selectedCell];
+        
+        // number of cells above this one = row count because row is a 0 based index.
+        NSInteger topCellCount = selectedRowRelativeToVisibleCells;
+        
+        // number of cells below this one = (total count-1 'for zero based index')-selected row
+        NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;
         
         // calculate distances that cells should move in order to be off-screen
         CGFloat topDistance = topCellCount * CGRectGetHeight(selectedCell.frame);
@@ -151,19 +156,33 @@
                 }
             }
         }
-
+        
+        // grab a copy of the label from colors view, convert its frame
+        // to the frame of the container view, then insert it below the
+        // colors view controller
+        UILabel * label = [[UILabel alloc] initWithFrame:colorViewController.colorLabel.frame];
+        label.textAlignment = colorViewController.colorLabel.textAlignment;
+        label.text = colorViewController.colorLabel.text;
+        label.font = colorViewController.colorLabel.font;
+        label.textColor = colorViewController.colorLabel.textColor;
+        label.frame = [containerView convertRect:label.frame fromView:colorViewController.view];
+        [containerView insertSubview:label aboveSubview:colorViewController.view];
+        
+        // hide existing color label
+        colorViewController.colorLabel.hidden = YES;
+        
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
             
             // convert cell frame to container view
             selectedCell.frame = [containerView convertRect:selectedCell.frame fromView:colorsViewController.tableView];
-
-            // animate label
+            
+            label.center = CGPointMake(CGRectGetMidX(selectedCell.frame), CGRectGetMidY(selectedCell.frame));
+            label.font = [UIFont fontWithName:@"Helvetica-Neue" size:12.0];
             
             // move cells back into view
             for(UITableViewCell * c in tableView.visibleCells) {
                 NSInteger rowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:c];
                 
-                //NSLog(@"reset frame to: %@", NSStringFromCGRect([[originalCellFrames objectAtIndex:rowRelativeToVisibleCells] CGRectValue]));
                 // reset all cell frames to original
                 c.frame = [[originalCellFrames objectAtIndex:rowRelativeToVisibleCells] CGRectValue];
             }
@@ -174,6 +193,10 @@
             selectedCell.alpha = 1.0;
 
             // remove label from container
+            [label removeFromSuperview];
+            
+            // show the label again
+            colorViewController.colorLabel.hidden = NO;
             
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
