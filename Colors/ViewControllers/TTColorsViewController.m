@@ -41,6 +41,8 @@
     // set up table view
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    self.tableView.separatorColor = [UIColor blackColor];
+    self.tableView.separatorInset = UIEdgeInsetsZero;
     
     UINib * xib = [UINib nibWithNibName:NSStringFromClass([TTColorTableViewCell class]) bundle:nil];
     [self.tableView registerNib:xib forCellReuseIdentifier:@"ColorCell"];
@@ -61,6 +63,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     TTColorTableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"ColorCell" forIndexPath:indexPath];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     TTColor * color = [self.colors objectAtIndex:indexPath.row];
     cell.textLabel.text = color.name;
     cell.backgroundColor = color.color;

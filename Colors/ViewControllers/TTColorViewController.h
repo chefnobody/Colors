@@ -15,6 +15,5 @@
 @property (nonatomic) TTColor * color;
 
 - (instancetype)initWithColor:(TTColor *)color;
-- (UILabel *)labelForColor;
 
 @end

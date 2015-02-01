@@ -41,7 +41,8 @@
     self.navigationController = [[UINavigationController alloc] initWithRootViewController:self.colorsViewController];
     self.window.rootViewController = self.navigationController;
     self.window.backgroundColor = [UIColor whiteColor];
-    [self.window makeKeyAndVisible];    return YES;
+    [self.window makeKeyAndVisible];
+    return YES;
 }
 
 #pragma mark - Custom methods
@@ -51,9 +52,12 @@
     
     TTColor * color = nil;
     
-    for (int i = 0; i < 255; i=i+10){
-        CGFloat fraction = i/255.0;
-        UIColor * rgbColor = [UIColor colorWithRed:fraction green:fraction blue:fraction alpha:1.0f];
+    for (int i = 0; i < 30; i++){
+
+        CGFloat red = arc4random_uniform(255) / 255.0;
+        CGFloat green = arc4random_uniform(255) / 255.0;
+        CGFloat blue = arc4random_uniform(255) / 255.0;
+        UIColor * rgbColor = [UIColor colorWithRed:red green:green blue:blue alpha:1.0f];
         color = [[TTColor alloc] initWithColor:rgbColor name:[rgbColor hexString]];
         [colors addObject:color];
     }
