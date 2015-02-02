@@ -90,6 +90,9 @@
             // remove label from container view
             [label removeFromSuperview];
             
+            // restore selected cell's alpha
+            selectedCell.alpha = 1.0;
+            
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
         
