@@ -4,3 +4,9 @@ Colors is a simple app that demonstrates how to use the UIViewController Transit
 
 Swipe from left to right, or tap one of the random colors to activate the transition.
 
+![UIViewController Transitioning API](demo.gif "Tap to expand and swipe left to reveal.")
+
+Sources:
+
+
+
