@@ -8,104 +8,112 @@
 
 #import "TTVerticalSplitAnimationController.h"
 #import "TTColorsViewController.h"
+#import "TTColorViewController.h"
+#import "UIColor+TTExtensions.h"
+
+#define TTRectSetY( r, y )  CGRectMake( r.origin.x, y, r.size.width, r.size.height )
 
 @implementation TTVerticalSplitAnimationController
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 0.5f;
+    return 1.0f;
 }
 
 - (void)animateTransition:(id <UIViewControllerContextTransitioning>)transitionContext {
     
-    /*UIView * containerView = transitionContext.containerView;
-    UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    UIView * containerView = transitionContext.containerView;
     
     if ( self.isPushing ) {
         
+        TTColorsViewController * colorsViewController = (TTColorsViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+        TTColorViewController * colorViewController = (TTColorViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+
+        // set container view background color
+        containerView.backgroundColor = colorViewController.color.color;
+        
         // Add to vc below from vc
-        [containerView insertSubview:toViewController.view belowSubview:fromViewController.view];
+        [containerView insertSubview:colorViewController.view belowSubview:colorsViewController.view];
         
         // get selected cell from table
-        UITableView * tableView = ((TTColorsViewController*)fromViewController).tableView;
+        UITableView * tableView = colorsViewController.tableView;
         NSIndexPath * selectedIndexPath = [tableView indexPathForSelectedRow];
         UITableViewCell * selectedCell = [tableView cellForRowAtIndexPath:selectedIndexPath];
         
-        // blank out the backgrounds of both the table view and it's parent view
+        // blank out the backgrounds of the table view and it's parent view and the cell
         tableView.backgroundColor = [UIColor clearColor];
-        fromViewController.view.backgroundColor = [UIColor clearColor];
+        colorsViewController.view.backgroundColor = [UIColor clearColor];
+        selectedCell.alpha = 0.0;
         
-        selectedCell.alpha = 0.0;           // blank out the cell
+        // row of selected cell relative to visible cells
+        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:selectedCell];
         
-        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowForVisibleCell:selectedCell FromTableView:tableView];    // row of selected cell relative to visible cells
-        NSInteger topCellCount = selectedRowRelativeToVisibleCells;   // number of cells above this one = row count because row is a 0 based index.
-        NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;     // number of cells below this one = (total count-1 'for zero based index')-selected row
+        // number of cells above this one = row count because row is a 0 based index.
+        NSInteger topCellCount = selectedRowRelativeToVisibleCells;
         
+        // number of cells below this one = (total count-1 'for zero based index')-selected row
+        NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;
+         
         // calculate distances that cells should move in order to be off-screen
         CGFloat topDistance = topCellCount * CGRectGetHeight(selectedCell.frame);
         CGFloat bottomDistance = bottomCellCount * CGRectGetHeight(selectedCell.frame);
-        */
-        /*NSLog(@"selected row relative to visible cells: %i", selectedRowRelativeToVisibleCells);
-         NSLog(@"selected cell row %i", selectedIndexPath.row);
-         NSLog(@"top cell count %i", topCellCount);
-         NSLog(@"bottom cell count %i", bottomCellCount);
-         NSLog(@"cell height: %f", selectedCell.frame.size.height);
-         NSLog(@"top distance: %f", topDistance);
-         NSLog(@"bottom distance: %f", bottomDistance);*/
-        /*
-        // create car image view and add below from view controller
-        UIImageView * carImageView = [((TTListViewController *)fromViewController) imageViewForSelectedRow];
-        carImageView.frame = [containerView convertRect:carImageView.frame fromView:tableView];
-        [containerView insertSubview:carImageView belowSubview:fromViewController.view];
         
-        // get stopping x,y of vehicle image
-        CGPoint stoppingPoint = ((TTDetailsViewController* )toViewController).carImageView.frame.origin;
-        stoppingPoint = [containerView convertPoint:stoppingPoint fromView:toViewController.view];
+        // prepare to animate label into place
+        UILabel * label = [colorsViewController labelForSelectedRow];
+        label.textAlignment = NSTextAlignmentCenter;
+        label.frame = [containerView convertRect:label.frame fromView:tableView];
+        [containerView insertSubview:label belowSubview:colorsViewController.view];
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             
-            // find all visible cells except the one selected and move them out of view
-            for(UITableViewCell * c in tableView.visibleCells) {
-                if ( c != selectedCell ) {
+            [tableView.visibleCells enumerateObjectsUsingBlock:^(UITableViewCell * cell, NSUInteger idx, BOOL *stop) {
+                if ( cell != selectedCell ) {
                     
-                    NSIndexPath * cellIndexPath = [tableView indexPathForCell:c];
+                    NSIndexPath * cellIndexPath = [tableView indexPathForCell:cell];
                     
                     if (cellIndexPath.row < selectedIndexPath.row) {
-                        // move cells up
-                        c.frame = TTRectSetY(c.frame, (CGRectGetMinY(c.frame) - topDistance));      // subtract height and distance
+                        // move cells up by subtracting height and distance
+                        cell.frame = TTRectSetY(cell.frame, (CGRectGetMinY(cell.frame) - topDistance));
                     }else{
-                        // move cells down
-                        c.frame = TTRectSetY(c.frame, CGRectGetMinY(c.frame) + bottomDistance);     // add height and distance
+                        // move cells down by adding height and distance
+                        cell.frame = TTRectSetY(cell.frame, CGRectGetMinY(cell.frame) + bottomDistance);
                     }
                 }
-            }
+            }];
             
-            carImageView.frame = CGRectMake(stoppingPoint.x, stoppingPoint.y, 320, 240);    // Hard coded values is a bit of a hack. Transforms would be cleaner, right?
+            // set final position, color and size of label
+            label.center = colorViewController.view.center;
+            label.textColor = [colorViewController.color.color isTooDarkForBlackText] ? [UIColor whiteColor] : [UIColor blackColor];
+            label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:30.0];
             
         } completion:^(BOOL finished) {
             
-            // Reload only visible rows
-            [tableView reloadRowsAtIndexPaths:[tableView indexPathsForVisibleRows] withRowAnimation:UITableViewRowAnimationNone];
-            [carImageView removeFromSuperview];
+            // remove label from container view
+            [label removeFromSuperview];
+            
+            // restore selected cell's alpha
+            selectedCell.alpha = 1.0;
+            
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
         
     } else {
+
+        TTColorViewController * colorViewController = (TTColorViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+        TTColorsViewController * colorsViewController = (TTColorsViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
         
         // insert to vc above from vc
-        [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
+        [containerView insertSubview:colorsViewController.view aboveSubview:colorViewController.view];
         
-        // get car from details view controller
-        NSDictionary * car = ((TTDetailsViewController*)fromViewController).car;
+        // get color from details view controller
+        TTColor * color = colorViewController.color;
         
-        // select car row to go back to
-        [((TTListViewController *)toViewController) selectRowWithCar:car];
+        // select row with given color
+        [colorsViewController selectRowWithColor:color];
         
         // get selected cell from table
-        UITableView * tableView = ((TTListViewController*)toViewController).tableView;
+        UITableView * tableView = colorsViewController.tableView;
         NSIndexPath * selectedIndexPath = [tableView indexPathForSelectedRow];
         UITableViewCell * selectedCell = [tableView cellForRowAtIndexPath:selectedIndexPath];
-        //NSLog(@"selected index path: %@", selectedIndexPath);
         
         // if selected cell is not visible scroll it into view and retrieve it again
         if ( ! [tableView.visibleCells containsObject:selectedCell] )
@@ -114,11 +122,17 @@
             selectedCell = [tableView cellForRowAtIndexPath:selectedIndexPath];
         }
         
-        selectedCell.alpha = 0.0;           // blank out the cell
+        // hide the cell
+        selectedCell.alpha = 0.0;
         
-        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowForVisibleCell:selectedCell FromTableView:tableView];    // row of selected cell relative to visible cells
-        NSInteger topCellCount = selectedRowRelativeToVisibleCells;   // number of cells above this one = row count because row is a 0 based index.
-        NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;     // number of cells below this one = (total count-1 'for zero based index')-selected row
+        // row of selected cell relative to visible cells
+        NSInteger selectedRowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:selectedCell];
+        
+        // number of cells above this one = row count because row is a 0 based index.
+        NSInteger topCellCount = selectedRowRelativeToVisibleCells;
+        
+        // number of cells below this one = (total count-1 'for zero based index')-selected row
+        NSInteger bottomCellCount = (tableView.visibleCells.count-1) - selectedRowRelativeToVisibleCells;
         
         // calculate distances that cells should move in order to be off-screen
         CGFloat topDistance = topCellCount * CGRectGetHeight(selectedCell.frame);
@@ -145,34 +159,33 @@
                 }
             }
         }
-        */
-        /*NSLog(@"selected row relative to visible cells: %i", selectedRowRelativeToVisibleCells);
-         NSLog(@"selected cell row %i", selectedIndexPath.row);
-         NSLog(@"top cell count %i", topCellCount);
-         NSLog(@"bottom cell count %i", bottomCellCount);
-         NSLog(@"cell height: %f", selectedCell.frame.size.height);
-         NSLog(@"top distance: %f", topDistance);
-         NSLog(@"bottom distance: %f", bottomDistance);*/
-        /*
-        // get image from details view
-        UIImageView * carImageView = [[UIImageView alloc] initWithImage:((TTDetailsViewController*)fromViewController).carImageView.image];
-        carImageView.frame = [containerView convertRect:carImageView.frame fromView:((TTDetailsViewController*)fromViewController).carImageView];
-        [containerView insertSubview:carImageView aboveSubview:fromViewController.view];
+        
+        // grab a copy of the label from colors view, convert its frame
+        // to the frame of the container view, then insert it below the
+        // colors view controller
+        UILabel * label = [[UILabel alloc] initWithFrame:colorViewController.colorLabel.frame];
+        label.textAlignment = colorViewController.colorLabel.textAlignment;
+        label.text = colorViewController.colorLabel.text;
+        label.font = colorViewController.colorLabel.font;
+        label.textColor = colorViewController.colorLabel.textColor;
+        label.frame = [containerView convertRect:label.frame fromView:colorViewController.view];
+        [containerView insertSubview:label aboveSubview:colorViewController.view];
+        
+        // hide existing color label
+        colorViewController.colorLabel.hidden = YES;
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
             
             // convert cell frame to container view
-            selectedCell.frame = [containerView convertRect:selectedCell.frame fromView:((TTListViewController*)toViewController).tableView];
-            carImageView.center = CGPointMake(CGRectGetMidX(selectedCell.frame), CGRectGetMidY(selectedCell.frame));
+            selectedCell.frame = [containerView convertRect:selectedCell.frame fromView:colorsViewController.tableView];
             
-            CGAffineTransform scaleTransform = CGAffineTransformMakeScale(2.0, 2.0);
-            CGAffineTransform translateTransform = CGAffineTransformMakeTranslation(40.0, 0.0);     // offset x by 40 ;. See TTCarTableViewCell.xib for offset in original image
-            carImageView.transform = CGAffineTransformConcat(scaleTransform, translateTransform);
+            label.center = CGPointMake(CGRectGetMidX(selectedCell.frame), CGRectGetMidY(selectedCell.frame));
+            label.font = [UIFont fontWithName:@"Helvetica-Neue" size:12.0];
             
             // move cells back into view
             for(UITableViewCell * c in tableView.visibleCells) {
-                NSInteger rowRelativeToVisibleCells = [self relativeRowForVisibleCell:c FromTableView:tableView];
-                NSLog(@"reset frame to: %@", NSStringFromCGRect([[originalCellFrames objectAtIndex:rowRelativeToVisibleCells] CGRectValue]));
+                NSInteger rowRelativeToVisibleCells = [self relativeRowInTableView:tableView forVisibleCell:c];
+                
                 // reset all cell frames to original
                 c.frame = [[originalCellFrames objectAtIndex:rowRelativeToVisibleCells] CGRectValue];
             }
@@ -181,16 +194,21 @@
             
             // show target cell
             selectedCell.alpha = 1.0;
+
+            // remove label from container
+            [label removeFromSuperview];
             
-            [carImageView removeFromSuperview];
+            // show the label again
+            colorViewController.colorLabel.hidden = NO;
+            
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
-    }*/
+    }
 }
 
 #pragma mark - Custom methods
 
-- (NSInteger)relativeRowForVisibleCell:(UITableViewCell *)cell FromTableView:(UITableView *)tableView {
+- (NSInteger)relativeRowInTableView:(UITableView *)tableView forVisibleCell:(UITableViewCell *)cell {
     
     NSInteger row = 0;
     

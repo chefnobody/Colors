@@ -10,6 +10,10 @@
 #import "TTColorsViewController.h"
 #import "TTColor.h"
 #import "UIColor+TTExtensions.h"
+#import "TTAnimatorFactory.h"
+#import "TTVerticalSplitAnimationController.h"
+#import "TTColorViewController.h"
+#import "TTColorsViewController.h"
 
 @interface AppDelegate ()
 
@@ -21,14 +25,24 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    // register the animation controller with the factory for the two vc's it should interact with
+    [[TTAnimatorFactory sharedInstance] registerAnimationControllerClass:[TTVerticalSplitAnimationController class]
+                                            forParentViewControllerClass:[TTColorsViewController class]
+                                                childViewControllerClass:[TTColorViewController class]];
+    
+    [[TTAnimatorFactory sharedInstance] registerAnimationControllerClass:[TTVerticalSplitAnimationController class]
+                                            forParentViewControllerClass:[TTColorViewController class]
+                                                childViewControllerClass:[TTColorsViewController class]];
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    NSLog(@"window frame: %@", NSStringFromCGRect(self.window.frame));
     self.colors = [self setUpColors];
     self.colorsViewController = [[TTColorsViewController alloc] initWithColors:self.colors];
     self.navigationController = [[UINavigationController alloc] initWithRootViewController:self.colorsViewController];
     self.window.rootViewController = self.navigationController;
     self.window.backgroundColor = [UIColor whiteColor];
-    [self.window makeKeyAndVisible];    return YES;
+    [self.window makeKeyAndVisible];
+    return YES;
 }
 
 #pragma mark - Custom methods
@@ -38,9 +52,12 @@
     
     TTColor * color = nil;
     
-    for (int i = 0; i < 255; i=i+10){
-        CGFloat fraction = i/255.0;
-        UIColor * rgbColor = [UIColor colorWithRed:fraction green:fraction blue:fraction alpha:1.0f];
+    for (int i = 0; i < 30; i++){
+
+        CGFloat red = arc4random_uniform(255) / 255.0;
+        CGFloat green = arc4random_uniform(255) / 255.0;
+        CGFloat blue = arc4random_uniform(255) / 255.0;
+        UIColor * rgbColor = [UIColor colorWithRed:red green:green blue:blue alpha:1.0f];
         color = [[TTColor alloc] initWithColor:rgbColor name:[rgbColor hexString]];
         [colors addObject:color];
     }

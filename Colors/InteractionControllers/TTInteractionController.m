@@ -7,6 +7,10 @@
 //
 
 #import "TTInteractionController.h"
+#import "TTColorViewController.h"
+#import "TTColorsViewController.h"
+#import "TTBaseAnimationController.h"
+#import "TTAnimatorFactory.h"
 
 @interface TTInteractionController()
 
@@ -34,21 +38,21 @@
     return self;
 }
 
-// For non-interactive
 - (void)push {
+    // For non-interactive transiations
     
-    /*self.pushing = YES;
+    self.pushing = YES;
     
-    TTDetailsViewController * detailsViewController = [[TTDetailsViewController alloc] initWithNibName:@"TTDetailsViewController" bundle:nil];
+    TTColorViewController * colorViewController = [[TTColorViewController alloc] initWithNibName:@"TTColorViewController" bundle:nil];
     
     // Add gesture recognizer for pop
     UIPanGestureRecognizer * panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(userDidPan:)];
-    [detailsViewController.view addGestureRecognizer:panGestureRecognizer];
+    [colorViewController.view addGestureRecognizer:panGestureRecognizer];
     
-    NSDictionary * car = [((TTListViewController *)self.parentViewController) carForSelectedRow];
-    detailsViewController.car = car;
+    TTColor * color = [((TTColorsViewController *)self.parentViewController) colorForSelectedRow];
+    colorViewController.color = color;
     
-    [self.parentViewController.navigationController pushViewController:detailsViewController animated:YES];*/
+    [self.parentViewController.navigationController pushViewController:colorViewController animated:YES];
 }
 
 #pragma mark - UINavigationControllerDelegate methods
@@ -59,7 +63,7 @@
                                                  toViewController:(UIViewController *)toVC {
     
     // Only provide a transitioning animator for pushes
-    /*if (operation == UINavigationControllerOperationPush) {
+    if (operation == UINavigationControllerOperationPush) {
         
         self.pushing = YES;
         
@@ -75,16 +79,15 @@
                                                                                                                      childViewControllerClass:[toVC class]];
         return animationController;
     }
-    */
+    
     return nil;
 }
 
 - (id<UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController
                          interactionControllerForAnimationController:(id<UIViewControllerAnimatedTransitioning>)animationController {
-    /*NSLog(@"navigationController:interactionControllerForAnimationController: %@ - interactive: %i", animationController, self.isInteractive);
     if ( self.isInteractive ) {
         return self;
-    }*/
+    }
     return nil;
 }
 
@@ -92,7 +95,8 @@
 
 - (void)userDidPan:(UIPanGestureRecognizer *)recognizer {
     
-    /*UIView* view = ((TTListViewController *)self.parentViewController).tableView;     // view for parent controller, not the parent's navigation
+    // view for parent controller, not the parent's navigation
+    UIView * view = ((TTColorsViewController *)self.parentViewController).tableView;
     
     if ( recognizer.state == UIGestureRecognizerStateBegan ) {
         
@@ -103,33 +107,28 @@
         
         if ( location.x < CGRectGetMidX(view.bounds) && velocity.x > 10 ) {
             
-            //NSLog(@"gesture began! pushing %i", self.pushing);
-            
             self.pushing = YES;
             
             // Push to details
-            TTDetailsViewController *detailsViewController = [[TTDetailsViewController alloc] initWithNibName:@"TTDetailsViewController" bundle:nil];
+            TTColorViewController * colorViewController = [[TTColorViewController alloc] initWithNibName:NSStringFromClass([TTColorViewController class]) bundle:nil];
             
             // add gesture recognizer
             UIPanGestureRecognizer * panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(userDidPan:)];
-            [detailsViewController.view addGestureRecognizer:panGestureRecognizer];
-            [self.parentViewController.navigationController pushViewController:detailsViewController animated:YES];
-            
-            //NSLog(@"selected point: %@", NSStringFromCGPoint(location));
+            [colorViewController.view addGestureRecognizer:panGestureRecognizer];
+            [self.parentViewController.navigationController pushViewController:colorViewController animated:YES];
             
             // Set selected cell for location
-            [((TTListViewController *)self.parentViewController) selectRowAtLocation:location];
+            [((TTColorsViewController *)self.parentViewController) selectRowAtLocation:location];
             
-            // Get car for selected row
-            NSDictionary * car = [((TTListViewController *)self.parentViewController) carForSelectedRow];
-            //NSLog(@"car: %@", car);
-            detailsViewController.car = car;
+            // Get color for selected row
+            TTColor * color = [((TTColorsViewController *)self.parentViewController) colorForSelectedRow];
+            colorViewController.color = color;
             
         } else {
             
             self.pushing = NO;
             
-            // initiates the pop when NOT pushing
+            // This is a pop, not a push.
             [self.parentViewController.navigationController popViewControllerAnimated:YES];
         }
         
@@ -141,8 +140,6 @@
         if (percentComplete >= 1.0) {
             percentComplete = .99;
         }
-        
-        //NSLog(@"percent complete: %f", percentComplete);
         
         [self updateInteractiveTransition:percentComplete];
         
@@ -168,10 +165,10 @@
         
         self.interactive = NO;
         self.pushing = NO;
-    }*/
+    }
 }
 
-#pragma mark - Custom methods
+#pragma mark Custom methods
 
 - (NSString *)stringForUINavigationControllerOperation:(UINavigationControllerOperation)operation {
     NSString * operationString = nil;

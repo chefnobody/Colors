@@ -7,11 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TTColor.h"
 
 @interface TTColorsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (strong, nonatomic) IBOutlet UITableView * tableView;
 
 - (instancetype)initWithColors:(NSArray *)colors;
+
+- (TTColor *)colorForSelectedRow;
+- (void)selectRowAtLocation:(CGPoint)location;
+- (void)selectRowWithColor:(TTColor *)color;
+- (UILabel *)labelForSelectedRow;
 
 @end

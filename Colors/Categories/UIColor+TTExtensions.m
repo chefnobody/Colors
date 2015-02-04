@@ -21,10 +21,11 @@
 
 - (BOOL)isTooDarkForBlackText {
     const CGFloat *components = CGColorGetComponents(self.CGColor);
-    CGFloat r = components[0];
-    CGFloat g = components[1];
-    CGFloat b = components[2];
-    return (r <= 0.5 && g <= 0.5 && b <= 0.5);
+    CGFloat red = components[0];
+    CGFloat green = components[1];
+    CGFloat blue = components[2];
+    CGFloat luminance = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
+    return (luminance <= 0.5);
 }
 
 @end

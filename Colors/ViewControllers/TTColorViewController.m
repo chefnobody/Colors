@@ -7,10 +7,10 @@
 //
 
 #import "TTColorViewController.h"
+#import "UIColor+TTExtensions.h"
 
 @interface TTColorViewController ()
 
-@property (strong, nonatomic) IBOutlet UILabel *colorLabel;
 
 @end
 
@@ -18,6 +18,7 @@
 
 - (instancetype)initWithColor:(TTColor *)color {
     self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
+    
     if ( self ) {
         self.color = color;
     }
@@ -27,8 +28,22 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.colorLabel.text = self.color.name;
+    self.title = @"Color";
+    self.edgesForExtendedLayout = UIRectEdgeNone;
+    self.colorLabel.text = @"";
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    self.view.backgroundColor = self.color.color;
+    self.colorLabel.textColor = [self.color.color isTooDarkForBlackText] ? [UIColor whiteColor] : [UIColor blackColor];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    self.colorLabel.text = self.color.name;
+}
 
 @end

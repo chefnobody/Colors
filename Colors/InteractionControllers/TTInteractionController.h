@@ -21,5 +21,4 @@
 // Pushes view controller non-interactively
 - (void)push;
 
-
 @end
