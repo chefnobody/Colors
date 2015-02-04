@@ -1,7 +1,5 @@
 # Colors
 
-## What is it?
-
 Colors is a simple app that demonstrates how to use the View Controller Transitioning API to create a transition effect like the one found in the Apple Weather app.
 
 ![UIViewController Transitioning API](demo.gif "Tap to expand and swipe left to reveal.")
@@ -28,12 +26,5 @@ All the magic happens in `TTVerticalSplitAnimationController`.
 ## Why can't I use a pinch gesture on the table?
 
 Because I haven't implemented that yet. The swipe was a minimum amount of gesture-based movement needed to achieve the effect.
-
-## Why is this so janky?
-
-
-
-Sources:
-
 
 
